@@ -5,6 +5,8 @@ import com.royal.CallData.entity.Subscriber;
 import com.royal.CallData.repository.CdrRecordRepository;
 import com.royal.CallData.repository.SubscriberRepository;
 import com.royal.CallData.util.UtilService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,18 +16,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static com.royal.CallData.util.UtilService.randomDateBetween;
 
 @Service
 public class CdrRecordServiceImpl implements CdrRecordService {
 
     private final SubscriberRepository subscriberRepository;
     private final CdrRecordRepository cdrRecordRepository;
+    private final Logger LOGGER = LoggerFactory.getLogger(CdrRecordServiceImpl.class);
     private final Random random = new Random();
 
     @Autowired
     public CdrRecordServiceImpl(SubscriberRepository subscriberRepository,
-                               CdrRecordRepository cdrRecordRepository) {
+                                CdrRecordRepository cdrRecordRepository) {
         this.subscriberRepository = subscriberRepository;
         this.cdrRecordRepository = cdrRecordRepository;
     }
@@ -34,7 +36,7 @@ public class CdrRecordServiceImpl implements CdrRecordService {
     public void generateCdrRecordsForYear() {
         List<Subscriber> subscribers = subscriberRepository.findAll();
         if (subscribers.isEmpty()) {
-            System.out.println("No subscribers found. Please initialize subscribers first.");
+            System.out.println("Подписчиков не найдено. Пожалуйста, сначала инициализируйте подписчиков.");
             return;
         }
 
@@ -83,7 +85,7 @@ public class CdrRecordServiceImpl implements CdrRecordService {
         // Сохранение всех записей в базу данных
         cdrRecordRepository.saveAll(cdrRecords);
 
-        System.out.println("Generated " + cdrRecords.size() + " CDR records for one year");
+        System.out.println("Сгенерировано " + cdrRecords.size() + " CDR записей за один год");
     }
 
 

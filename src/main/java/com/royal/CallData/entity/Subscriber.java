@@ -38,9 +38,6 @@ public class Subscriber {
 
     @Override
     public String toString() {
-        return "Subscriber{" +
-                "id=" + id +
-                ", msisdn='" + msisdn + '\'' +
-                '}';
+        return "Subscriber{" + "id=" + id + ", msisdn='" + msisdn + '\'' + '}';
     }
 }

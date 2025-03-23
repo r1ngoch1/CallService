@@ -2,6 +2,8 @@ package com.royal.CallData.init;
 
 import com.royal.CallData.entity.Subscriber;
 import com.royal.CallData.repository.SubscriberRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -13,6 +15,7 @@ import java.util.List;
 public class DataInitializationService implements CommandLineRunner {
 
     private final SubscriberRepository subscriberRepository;
+    private final Logger LOGGER = LoggerFactory.getLogger(DataInitializationService.class);
 
     @Autowired
     public DataInitializationService(SubscriberRepository subscriberRepository) {
@@ -35,6 +38,6 @@ public class DataInitializationService implements CommandLineRunner {
         );
 
         subscriberRepository.saveAll(subscribers);
-        System.out.println("Initialized " + subscribers.size() + " subscribers");
+        System.out.println("Создано " + subscribers.size() + " абонентов");
     }
 }
