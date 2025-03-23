@@ -1,12 +1,17 @@
 package com.royal.CallData.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 /**
  * DTO  для запроса на генерацию периодического отчета.
  */
 
 public class PeriodicReportRequest {
+    @Schema(description = "Номер абонента", example = "79161234567")
     private String msisdn;
-    private String period; // "6months", "3months", "1month", etc.
+
+    @Schema(description = "Период для отчета, например: '6months', '3months', '1month'", example = "6months")
+    private String period;
 
     public PeriodicReportRequest() {
     }

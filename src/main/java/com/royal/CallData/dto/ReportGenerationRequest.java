@@ -1,5 +1,7 @@
 package com.royal.CallData.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.time.LocalDateTime;
 
 /**
@@ -7,8 +9,13 @@ import java.time.LocalDateTime;
  */
 
 public class ReportGenerationRequest {
+    @Schema(description = "Номер абонента", example = "79161234567")
     private String msisdn;
+
+    @Schema(description = "Дата и время начала периода", example = "2025-03-01T10:00:00")
     private LocalDateTime startDate;
+
+    @Schema(description = "Дата и время конца периода", example = "2025-03-23T18:00:00")
     private LocalDateTime endDate;
 
     public ReportGenerationRequest() {

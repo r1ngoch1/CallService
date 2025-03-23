@@ -40,7 +40,8 @@ public class CdrRecordServiceImpl implements CdrRecordService {
      * Создаются случайные записи о звонках между абонентами в случайное время.
      * Генерируется от 5 до 15 звонков на каждого абонента в месяц.
      * Каждый звонок имеет случайную продолжительность от 10 секунд до 1 часа.
-     */    public void generateCdrRecordsForYear() {
+     */
+    public void generateCdrRecordsForYear() {
         LOGGER.info("Начало генерации CDR записей за один год");
         List<Subscriber> subscribers = subscriberRepository.findAll();
         if (subscribers.isEmpty()) {

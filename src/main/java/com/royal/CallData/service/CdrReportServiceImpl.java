@@ -107,7 +107,7 @@ public class CdrReportServiceImpl implements CdrReportService {
      * Генерирует файл отчета по заданным параметрам.
      * Выполняется асинхронно для предотвращения блокировки основного потока.
      *
-     * @param request  Запрос на генерацию отчета.
+     * @param request   Запрос на генерацию отчета.
      * @param requestId Уникальный идентификатор запроса.
      */
     private void generateReportFile(ReportGenerationRequest request, UUID requestId) {

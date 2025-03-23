@@ -1,5 +1,7 @@
 package com.royal.CallData.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.UUID;
 
 /**
@@ -7,9 +9,16 @@ import java.util.UUID;
  */
 
 public class ReportGenerationResponse {
+    @Schema(description = "Статус генерации отчета", example = "completed")
     private String status;
+
+    @Schema(description = "Уникальный идентификатор запроса", example = "a3c3fbb0-7179-4fdb-b21b-05644a06f7f1")
     private UUID requestId;
+
+    @Schema(description = "Сообщение о статусе запроса", example = "Отчет успешно сгенерирован")
     private String message;
+
+    @Schema(description = "Путь к сгенерированному отчету", example = "/path/to/report/file.pdf")
     private String filePath;
 
     public ReportGenerationResponse() {

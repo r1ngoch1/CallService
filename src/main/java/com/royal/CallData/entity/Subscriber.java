@@ -1,5 +1,6 @@
 package com.royal.CallData.entity;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
@@ -13,8 +14,10 @@ import jakarta.persistence.GenerationType;
 public class Subscriber {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "Уникальный идентификатор абонента", example = "1")
     private Long id;
 
+    @Schema(description = "Номер MSISDN абонента", example = "+79161234567")
     private String msisdn;
 
     public Subscriber() {

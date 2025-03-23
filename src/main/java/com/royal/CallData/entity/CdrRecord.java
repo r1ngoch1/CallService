@@ -1,5 +1,6 @@
 package com.royal.CallData.entity;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
@@ -15,12 +16,22 @@ import java.time.LocalDateTime;
 public class CdrRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "Уникальный идентификатор CDR записи", example = "1")
     private Long id;
 
+    @Schema(description = "Тип звонка (01 - исходящий, 02 - входящий)", example = "01")
     private String callType; // 01 - исходящие, 02 - входящие
+
+    @Schema(description = "Номер звонящего абонента", example = "+79161234567")
     private String callerMsisdn; // Номер звонящего
+
+    @Schema(description = "Номер принимающего абонента", example = "+79161234568")
     private String receiverMsisdn; // Номер принимающего
+
+    @Schema(description = "Время начала звонка", example = "2025-03-23T14:30:00")
     private LocalDateTime startTime; // Время начала звонка
+
+    @Schema(description = "Время окончания звонка", example = "2025-03-23T14:45:00")
     private LocalDateTime endTime; // Время окончания звонка
 
     public CdrRecord() {
