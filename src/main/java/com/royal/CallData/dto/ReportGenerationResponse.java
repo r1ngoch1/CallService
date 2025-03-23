@@ -2,6 +2,10 @@ package com.royal.CallData.dto;
 
 import java.util.UUID;
 
+/**
+ * DTO для ответа на запрос на генерацию отчета.
+ */
+
 public class ReportGenerationResponse {
     private String status;
     private UUID requestId;

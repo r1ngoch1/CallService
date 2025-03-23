@@ -1,5 +1,9 @@
 package com.royal.CallData.dto;
 
+/**
+ * DTO  для запроса на генерацию периодического отчета.
+ */
+
 public class PeriodicReportRequest {
     private String msisdn;
     private String period; // "6months", "3months", "1month", etc.

@@ -22,6 +22,14 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Сервис для генерации отчетов по записям CDR (Call Detail Record) в формате CSV.
+ * Отчеты могут быть сгенерированы по конкретному пользователю (MSISDN) и диапазону дат,
+ * а также по периодическим запросам (например, за 1 неделю, 1 месяц, 3 месяца или 6 месяцев).
+ * Этот сервис выполняет генерацию отчетов асинхронно и отслеживает статус их выполнения.
+ * Статус может быть "PROCESSING" (в процессе), "COMPLETED" (успешно завершен),
+ * "COMPLETED_EMPTY" (пустой отчет) или "ERROR" (ошибка при генерации).
+ */
 @Service
 public class CdrReportServiceImpl implements CdrReportService {
 
@@ -30,6 +38,11 @@ public class CdrReportServiceImpl implements CdrReportService {
     private final ConcurrentHashMap<UUID, String> reportStatusMap = new ConcurrentHashMap<>();
     private final String REPORTS_DIRECTORY = "reports";
 
+    /**
+     * Конструктор, инициализирующий сервис и создающий директорию для отчетов, если она не существует.
+     *
+     * @param cdrRecordRepository Репозиторий для работы с записями CDR.
+     */
     @Autowired
     public CdrReportServiceImpl(CdrRecordRepository cdrRecordRepository) {
         this.cdrRecordRepository = cdrRecordRepository;
@@ -37,21 +50,31 @@ public class CdrReportServiceImpl implements CdrReportService {
         createReportsDirectory();
     }
 
+    /**
+     * Создает директорию для отчетов, если она не существует.
+     */
     private void createReportsDirectory() {
         Path path = Paths.get(REPORTS_DIRECTORY);
         if (!Files.exists(path)) {
             try {
                 Files.createDirectories(path);
-                System.out.println("Созданный каталог отчетов: " + path.toAbsolutePath());
+                LOGGER.info("Созданный каталог отчетов: {}", path.toAbsolutePath());
             } catch (IOException e) {
-                System.err.println("Не удалось создать каталог отчетов: " + e.getMessage());
+                LOGGER.error("Не удалось создать каталог отчетов", e);
             }
         }
     }
 
+    /**
+     * Генерирует отчет по запросу. Запуск отчета происходит асинхронно.
+     *
+     * @param request Запрос на генерацию отчета.
+     * @return Ответ с информацией о статусе запроса.
+     */
     @Override
     public ReportGenerationResponse generateReport(ReportGenerationRequest request) {
-        // Валидация запроса
+        LOGGER.info("Получен запрос на генерацию отчета для MSISDN: {}", request.getMsisdn());
+
         if (request.getMsisdn() == null || request.getMsisdn().trim().isEmpty()) {
             return new ReportGenerationResponse("error", null, "Требуется MSISDN", null);
         }
@@ -64,16 +87,14 @@ public class CdrReportServiceImpl implements CdrReportService {
             return new ReportGenerationResponse("error", null, "Дата окончания не может быть раньше даты начала", null);
         }
 
-        // Генерация UUID для запроса
         UUID requestId = UUID.randomUUID();
 
-        // Асинхронная генерация отчета
+        LOGGER.info("Запущена асинхронная генерация отчета с ID: {}", requestId);
+
         CompletableFuture.runAsync(() -> generateReportFile(request, requestId));
 
-        // Сохранение статуса в мапе
         reportStatusMap.put(requestId, "PROCESSING");
 
-        // Возврат успешного ответа с UUID запроса
         return new ReportGenerationResponse(
                 "success",
                 requestId,
@@ -82,7 +103,16 @@ public class CdrReportServiceImpl implements CdrReportService {
         );
     }
 
+    /**
+     * Генерирует файл отчета по заданным параметрам.
+     * Выполняется асинхронно для предотвращения блокировки основного потока.
+     *
+     * @param request  Запрос на генерацию отчета.
+     * @param requestId Уникальный идентификатор запроса.
+     */
     private void generateReportFile(ReportGenerationRequest request, UUID requestId) {
+        LOGGER.info("Начало формирования отчета {} для MSISDN: {}", requestId, request.getMsisdn());
+
         try {
             // Получение данных из БД
             List<CdrRecord> records = cdrRecordRepository.findBySubscriberAndDateRange(
@@ -92,6 +122,7 @@ public class CdrReportServiceImpl implements CdrReportService {
             );
 
             if (records.isEmpty()) {
+                LOGGER.info("Отчет {} пуст, записи не найдены", requestId);
                 reportStatusMap.put(requestId, "COMPLETED_EMPTY");
                 return;
             }
@@ -107,19 +138,25 @@ public class CdrReportServiceImpl implements CdrReportService {
                 }
             }
 
-            // Обновление статуса
+            LOGGER.info("Отчет {} успешно создан: {}", requestId, filePath);
             reportStatusMap.put(requestId, "COMPLETED:" + filePath);
 
         } catch (Exception e) {
-            // В случае ошибки
+            LOGGER.error("Ошибка при формировании отчета {}", requestId, e);
             reportStatusMap.put(requestId, "ERROR:" + e.getMessage());
-            e.printStackTrace();
         }
     }
 
+    /**
+     * Генерирует периодический отчет по запросу с указанием периода (например, 1 месяц, 3 месяца и т.д.).
+     *
+     * @param request Запрос на генерацию периодического отчета.
+     * @return Ответ с информацией о статусе запроса.
+     */
     @Override
     public ReportGenerationResponse generatePeriodicReport(PeriodicReportRequest request) {
-        // Валидация запроса
+        LOGGER.info("Получен запрос на периодический отчет для MSISDN: {} с периодом: {}", request.getMsisdn(), request.getPeriod());
+
         if (request.getMsisdn() == null || request.getMsisdn().trim().isEmpty()) {
             return new ReportGenerationResponse("error", null, "Требуется MSISDN", null);
         }
@@ -150,16 +187,22 @@ public class CdrReportServiceImpl implements CdrReportService {
                         "Неподдерживаемый период. Допустимые значения: 6months, 3months, 1month, 1week", null);
         }
 
-        // Создаем стандартный запрос с вычисленными датами
         ReportGenerationRequest standardRequest = new ReportGenerationRequest(
                 request.getMsisdn(), startDate, endDate);
 
-        // Используем существующую логику для генерации отчета
         return generateReport(standardRequest);
     }
 
+    /**
+     * Возвращает статус отчета по его уникальному идентификатору.
+     *
+     * @param requestId Уникальный идентификатор запроса.
+     * @return Ответ с информацией о статусе отчета.
+     */
     @Override
     public ReportGenerationResponse getReportStatus(UUID requestId) {
+        LOGGER.info("Запрос статуса отчета с ID: {}", requestId);
+
         if (!reportStatusMap.containsKey(requestId)) {
             return new ReportGenerationResponse("error", requestId, "Отчет не найден", null);
         }

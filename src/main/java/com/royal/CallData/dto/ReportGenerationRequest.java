@@ -2,6 +2,10 @@ package com.royal.CallData.dto;
 
 import java.time.LocalDateTime;
 
+/**
+ * DTO  для запроса на генерацию отчета CDR за определенный период.
+ */
+
 public class ReportGenerationRequest {
     private String msisdn;
     private LocalDateTime startDate;

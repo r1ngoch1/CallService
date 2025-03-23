@@ -7,6 +7,10 @@ import jakarta.persistence.GenerationType;
 
 import java.time.LocalDateTime;
 
+/**
+ * Сущность, представляющая запись CDR (Call Data Record), содержащую информацию о звонке.
+ */
+
 @Entity
 public class CdrRecord {
     @Id

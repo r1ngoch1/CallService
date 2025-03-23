@@ -5,6 +5,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 
+/**
+ * Сущность, представляющая абонента с уникальным номером MSISDN.
+ */
+
 @Entity
 public class Subscriber {
     @Id

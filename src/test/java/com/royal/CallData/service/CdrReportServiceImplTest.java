@@ -50,7 +50,7 @@ public class CdrReportServiceImplTest {
                 Files.createDirectories(reportDir);
             }
         } catch (Exception e) {
-            fail("Failed to create test reports directory: " + e.getMessage());
+            fail("Не удалось создать каталог отчетов для тестирования: " + e.getMessage());
         }
 
         ConcurrentHashMap<UUID, String> reportStatusMap = new ConcurrentHashMap<>();
@@ -216,7 +216,7 @@ public class CdrReportServiceImplTest {
     @Test
     void testGetReportStatus_Error() {
         ConcurrentHashMap<UUID, String> reportStatusMap = new ConcurrentHashMap<>();
-        reportStatusMap.put(testUuid, "ERROR:Something went wrong");
+        reportStatusMap.put(testUuid, "ERROR:Что то пошло не так");
         ReflectionTestUtils.setField(cdrReportService, "reportStatusMap", reportStatusMap);
 
         ReportGenerationResponse response = cdrReportService.getReportStatus(testUuid);
@@ -224,7 +224,7 @@ public class CdrReportServiceImplTest {
         assertNotNull(response);
         assertEquals("error", response.getStatus());
         assertEquals(testUuid, response.getRequestId());
-        assertEquals("Something went wrong", response.getMessage());
+        assertEquals("Что то пошло не так", response.getMessage());
         assertNull(response.getFilePath());
     }
 
@@ -292,7 +292,7 @@ public class CdrReportServiceImplTest {
         UUID requestId = UUID.randomUUID();
 
         when(cdrRecordRepository.findBySubscriberAndDateRange(eq(TEST_MSISDN), any(), any()))
-                .thenThrow(new RuntimeException("Test exception"));
+                .thenThrow(new RuntimeException("Тестовая ошибка"));
 
         ReflectionTestUtils.invokeMethod(cdrReportService, "generateReportFile", request, requestId);
 
@@ -302,7 +302,7 @@ public class CdrReportServiceImplTest {
 
         assertNotNull(status);
         assertTrue(status.startsWith("ERROR:"));
-        assertTrue(status.contains("Test exception"));
+        assertTrue(status.contains("Тестовая ошибка"));
 
         verify(cdrRecordRepository).findBySubscriberAndDateRange(eq(TEST_MSISDN), eq(startDate), eq(endDate));
     }
